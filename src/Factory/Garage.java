@@ -1,6 +1,9 @@
 package Factory;
 
-import Concrete.*;
+import Concrete.*; //WTF?
+import Strategy.RabattPris;  //WTF?
+import Strategy.StrategierPris;  //WTF?
+import Strategy.SuperRabattPris;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -12,11 +15,11 @@ import java.util.Scanner;
 public class Garage {
 
     private static final int antalParkeringsplatser = 20;
-
     private int antalParkeradeFordon = 0;
     private double totalPris = 0;
     private final int maxTidParkering = 365;
     private List<Fordon> parkeradeFordon = new ArrayList<>();
+    private StrategierPris prisStrategi; //För strategi
     private static Garage garageInstans = new Garage(); //OBS! STATIK VARIABEL!
 
     private Garage() { //Tom konstruktor pga Singleton
@@ -58,13 +61,26 @@ public class Garage {
         return f;
     }
 
-    public void checkaUtFordon(String regNr) {
+    public void checkaUtFordon(String regNr) { //strategi?
         int bilPaPlats = hittaFordon(regNr);
         if (bilPaPlats == -1) {
             System.out.println("Bilen är inte parkerad här");
-        } else {
-            totalPris = beräknaPris(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
+        }
+        else if (kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)) > 5) { //Borde vara rabatt?
+            this.prisStrategi = new RabattPris();
+            totalPris = beräknaPrisVersion2(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
             parkeradeFordon.remove(bilPaPlats);
+            skickaFaktura(); //Ändra dessa sen?
+        }else if (kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)) > 10) { //Borde vara rabatt?
+            this.prisStrategi = new SuperRabattPris();
+            totalPris = beräknaPrisVersion2(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
+            parkeradeFordon.remove(bilPaPlats);
+            skickaFaktura(); //Ändra dessa sen?
+        }
+        else {
+            totalPris = beräknaPrisVersion2(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
+            parkeradeFordon.remove(bilPaPlats);
+            skickaFaktura(); //Ändra dessa sen? En return kanske? 0 eller 1 etc.
         }
     }
 
@@ -81,14 +97,22 @@ public class Garage {
 
     public int kontrolleraParkeringstid(Fordon f) {
         LocalDate lD = LocalDate.now();
-        System.out.println(f.getIncheckningstid().toString());
-        Period periods = Period.between(f.getIncheckningstid(), lD);
+        //System.out.println(f.getIncheckningstid().toString());
+        Period periods = Period.between(f.getIncheckningstid(), lD); //Behövs denna?
         long days = ChronoUnit.DAYS.between(f.getIncheckningstid(), lD);
         return (int)days;
     }
 
-    public double beräknaPris(Fordon f, int antalDagar) {
+    public void setPrisStrategi(StrategierPris prisStrategi) { //Sätter strategi
+        this.prisStrategi = prisStrategi;
+    }
+
+   /* public double beräknaPris(Fordon f, int antalDagar) {
         return (f.getPris() * antalDagar);
+    } */
+
+    public double beräknaPrisVersion2(Fordon f, int antalDagar) {
+        return prisStrategi.räknaUtPris(f, antalDagar);
     }
 
     public void skickaFaktura() {

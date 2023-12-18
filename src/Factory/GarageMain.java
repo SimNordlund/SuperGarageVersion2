@@ -1,19 +1,19 @@
 package Factory;
 
-import Concrete.Fordon;
-
+import Concrete.Fordon; //WTF är dessa?
+import Strategy.NormaltPris; //WTF är dessa?
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
 public class GarageMain {
-  //  private final Garage garage = new Garage();
     Garage garage = Garage.getGarageInstans();
     private final Databas databas = new Databas();
     private final Scanner scan = new Scanner(System.in);
     private final LocalDate parkeringsDatum = LocalDate.now();
 
     public GarageMain() {
+        garage.setPrisStrategi(new NormaltPris()); //Sätter till att börja med normaltpris.
         try {
             läsInFordon();
             välkommenOchInfo();
@@ -69,8 +69,7 @@ public class GarageMain {
         } else if (inEllerUtFråga.equals("2")) {
             System.out.println("Vad har du för registreringsnummer?");
             String regNr = scan.nextLine();
-            garage.checkaUtFordon(regNr);
-            garage.skickaFaktura();
+            garage.checkaUtFordon(regNr); //Ändrat denna?
         } else if (inEllerUtFråga.equals("3")) {
             System.out.println("Adjöken!");
             databas.sparaFordon(garage.getParkeradeFordon());
