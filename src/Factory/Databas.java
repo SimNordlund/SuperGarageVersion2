@@ -1,4 +1,5 @@
 package Factory;
+
 import Concrete.*;
 
 import java.io.*;
@@ -25,7 +26,6 @@ public class Databas {
         try (BufferedReader reader = new BufferedReader(new FileReader("src/Factory/fordon.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
-
                 String[] tempDelar = line.split(", ");
 
                 String fordonsTyp = tempDelar[0];
@@ -44,12 +44,10 @@ public class Databas {
                 if (fordonsTyp.equals("Motorcykel")) {
                     parkeradeBilar.add(new Motorcykel(regNummer, parkeringsDatum));
                 }
-
             }
         } catch (IOException e) {
             System.out.println("Fel inträffade vid läsning från fil.");
         }
-
         return parkeradeBilar;
     }
 }

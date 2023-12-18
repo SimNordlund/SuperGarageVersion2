@@ -1,19 +1,20 @@
 package Factory;
 
-import Concrete.Fordon; //WTF är dessa?
-import Strategy.NormaltPris; //WTF är dessa?
+import Concrete.Fordon;
+import Strategy.NormaltPris;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
 public class GarageMain {
-    Garage garage = Garage.getGarageInstans();
     private final Databas databas = new Databas();
     private final Scanner scan = new Scanner(System.in);
     private final LocalDate parkeringsDatum = LocalDate.now();
+    Garage garage = Garage.getGarageInstans();
 
     public GarageMain() {
-        garage.setPrisStrategi(new NormaltPris()); //Sätter till att börja med normaltpris.
+        garage.setPrisStrategi(new NormaltPris()); //Börjar med normaltpris. Justeras om man är berättigad rabatt.
         try {
             läsInFordon();
             välkommenOchInfo();
@@ -35,7 +36,6 @@ public class GarageMain {
             System.out.println(e.getMessage());
             System.exit(0);
         }
-
     }
 
     public static void main(String[] args) {
@@ -62,14 +62,18 @@ public class GarageMain {
                 if (garage.checkaInFordon(fordonsTyp, regNr, parkeringsDatum) == null) {
                     System.out.println("Fordonet får inte parkera här.");
                 }
-
-            } else {
+            }
+            else {
                 System.out.println("Garaget är fullt, vänligen återkom i ett senare skede.");
             }
         } else if (inEllerUtFråga.equals("2")) {
+            int temp = 0;
             System.out.println("Vad har du för registreringsnummer?");
             String regNr = scan.nextLine();
-            garage.checkaUtFordon(regNr); //Ändrat denna?
+            temp = garage.checkaUtFordon(regNr);
+            if (temp == 0) {
+                garage.skickaFaktura();
+            }
         } else if (inEllerUtFråga.equals("3")) {
             System.out.println("Adjöken!");
             databas.sparaFordon(garage.getParkeradeFordon());

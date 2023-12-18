@@ -1,12 +1,12 @@
 package Factory;
 
-import Concrete.*; //WTF?
-import Strategy.RabattPris;  //WTF?
-import Strategy.StrategierPris;  //WTF?
+import Concrete.*;
+import Strategy.RabattPris;
+import Strategy.StrategierPris;
 import Strategy.SuperRabattPris;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,18 +15,20 @@ import java.util.Scanner;
 public class Garage {
 
     private static final int antalParkeringsplatser = 20;
+    private static final Garage garageInstans = new Garage(); //OBS! STATIK VARIABEL!
+    private final int maxTidParkering = 365;
     private int antalParkeradeFordon = 0;
     private double totalPris = 0;
-    private final int maxTidParkering = 365;
     private List<Fordon> parkeradeFordon = new ArrayList<>();
     private StrategierPris prisStrategi; //För strategi
-    private static Garage garageInstans = new Garage(); //OBS! STATIK VARIABEL!
 
     private Garage() { //Tom konstruktor pga Singleton
     }
+
     public static Garage getGarageInstans() { //Statik för singelton, en instans.
         return garageInstans;
     }
+
     public Fordon checkaInFordon(String typ, String regNr, LocalDate parkeringsDatum) {
 
         Scanner scan = new Scanner(System.in);
@@ -61,28 +63,26 @@ public class Garage {
         return f;
     }
 
-    public void checkaUtFordon(String regNr) { //strategi?
+    public int checkaUtFordon(String regNr) {
         int bilPaPlats = hittaFordon(regNr);
         if (bilPaPlats == -1) {
             System.out.println("Bilen är inte parkerad här");
-        }
-        else if (kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)) > 5) { //Borde vara rabatt?
+            return -1;
+        } else if (kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)) > 5) {
             this.prisStrategi = new RabattPris();
             totalPris = beräknaPrisVersion2(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
             parkeradeFordon.remove(bilPaPlats);
-            skickaFaktura(); //Ändra dessa sen?
-        }else if (kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)) > 10) { //Borde vara rabatt?
+        } else if (kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)) > 10) {
             this.prisStrategi = new SuperRabattPris();
             totalPris = beräknaPrisVersion2(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
             parkeradeFordon.remove(bilPaPlats);
-            skickaFaktura(); //Ändra dessa sen?
-        }
-        else {
+        } else {
             totalPris = beräknaPrisVersion2(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
             parkeradeFordon.remove(bilPaPlats);
-            skickaFaktura(); //Ändra dessa sen? En return kanske? 0 eller 1 etc.
         }
+        return 0;
     }
+
 
     public int hittaFordon(String regNr) {
         int counter = 0;
@@ -97,26 +97,22 @@ public class Garage {
 
     public int kontrolleraParkeringstid(Fordon f) {
         LocalDate lD = LocalDate.now();
-        //System.out.println(f.getIncheckningstid().toString());
-        Period periods = Period.between(f.getIncheckningstid(), lD); //Behövs denna?
         long days = ChronoUnit.DAYS.between(f.getIncheckningstid(), lD);
-        return (int)days;
+        return (int) days;
     }
 
     public void setPrisStrategi(StrategierPris prisStrategi) { //Sätter strategi
         this.prisStrategi = prisStrategi;
     }
 
-   /* public double beräknaPris(Fordon f, int antalDagar) {
-        return (f.getPris() * antalDagar);
-    } */
-
     public double beräknaPrisVersion2(Fordon f, int antalDagar) {
         return prisStrategi.räknaUtPris(f, antalDagar);
     }
 
     public void skickaFaktura() {
-        System.out.println("Ditt totalpris blir: " + totalPris + "kronor.");
+        DecimalFormat formateringAvPris = new DecimalFormat("0.00");
+        String formateratPris = formateringAvPris.format(totalPris);
+        System.out.println("Ditt totalpris blir: " + formateratPris + " kr.");
         System.out.println("Fakturan skickas till fordonsägarens hemadress, välkommen åter.");
     }
 
