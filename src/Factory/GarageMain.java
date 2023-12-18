@@ -11,7 +11,7 @@ public class GarageMain {
     private final Databas databas = new Databas();
     private final Scanner scan = new Scanner(System.in);
     private final LocalDate parkeringsDatum = LocalDate.now();
-    Garage garage = Garage.getGarageInstans();
+    private final Garage garage = Garage.getGarageInstans(); //Ska den vara final?
 
     public GarageMain() {
         garage.setPrisStrategi(new NormaltPris()); //Börjar med normaltpris. Justeras om man är berättigad rabatt.

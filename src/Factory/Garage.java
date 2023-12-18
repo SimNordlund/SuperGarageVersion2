@@ -30,11 +30,10 @@ public class Garage {
     }
 
     public Fordon checkaInFordon(String typ, String regNr, LocalDate parkeringsDatum) {
-
         Scanner scan = new Scanner(System.in);
-
         Fordon f = null;
         regNr = regNr.toUpperCase().trim();
+
         if (typ.equalsIgnoreCase("Bil")) {
             f = new Bil(regNr, parkeringsDatum);
         }
@@ -83,7 +82,6 @@ public class Garage {
         return 0;
     }
 
-
     public int hittaFordon(String regNr) {
         int counter = 0;
         for (Fordon f : parkeradeFordon) {
@@ -96,9 +94,9 @@ public class Garage {
     }
 
     public int kontrolleraParkeringstid(Fordon f) {
-        LocalDate lD = LocalDate.now();
-        long days = ChronoUnit.DAYS.between(f.getIncheckningstid(), lD);
-        return (int) days;
+        LocalDate lokalTid = LocalDate.now();
+        long dagarParkerat = ChronoUnit.DAYS.between(f.getIncheckningstid(), lokalTid);
+        return (int) dagarParkerat;
     }
 
     public void setPrisStrategi(StrategierPris prisStrategi) { //Sätter strategi
