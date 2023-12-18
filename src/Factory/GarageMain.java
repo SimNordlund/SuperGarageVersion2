@@ -14,7 +14,7 @@ public class GarageMain {
     private final Garage garage = Garage.getGarageInstans(); //Ska den vara final?
 
     public GarageMain() {
-        garage.setPrisStrategi(new NormaltPris()); //Börjar med normaltpris. Justeras om man är berättigad rabatt.
+        garage.setPrisStrategi(new NormaltPris());
         try {
             läsInFordon();
             välkommenOchInfo();
@@ -81,7 +81,27 @@ public class GarageMain {
         }
     }
 
+    public void kontrollOmAnställd () {
+        System.out.println("Ange lösenordet");
+        int försökLösenord = 0;
+        while (true) {
+            String indataAnställd = scan.nextLine();
+            if (indataAnställd.equals("Garage123")) {
+                System.out.println("Korrekt lösenord");
+                break;
+            }
+            System.out.println("Fel lösenord");
+            försökLösenord++;
+            if (försökLösenord == 3) {
+                System.out.println("Programmet avslutas. Du har försökt för många gånger.");
+                databas.sparaFordon(garage.getParkeradeFordon());
+                System.exit(0);
+            }
+        }
+    }
+
     public void anställd() {
+        kontrollOmAnställd();
         System.out.println("Vad vill du göra? Ange: \n- 1 för att söka i databas eller\n- 2 för Checka in eller checka ut en kund" +
                 "\n- 3 för att skriva ut alla fordon" + " \n- 4 för att kontrollera parkeringstid."
                 + " \n- 5 för att stänga ner programmet.");
@@ -121,5 +141,6 @@ public class GarageMain {
     public void läsInFordon() {
         List<Fordon> tempHållare = databas.läsInFordon();
         garage.setParkeradeFordon(tempHållare);
+        garage.setAntalParkeradeFordon(tempHållare.size());
     }
 }

@@ -17,10 +17,10 @@ public class Garage {
     private static final int antalParkeringsplatser = 20;
     private static final Garage garageInstans = new Garage(); //OBS! STATIK VARIABEL!
     private final int maxTidParkering = 365;
-    private int antalParkeradeFordon = 0;
+    private int antalParkeradeFordon;
     private double totalPris = 0;
     private List<Fordon> parkeradeFordon = new ArrayList<>();
-    private StrategierPris prisStrategi; //För strategi
+    private StrategierPris prisStrategi;
 
     private Garage() { //Tom konstruktor pga Singleton
     }
@@ -103,6 +103,10 @@ public class Garage {
         this.prisStrategi = prisStrategi;
     }
 
+    public void setAntalParkeradeFordon(int antalParkeradeFordon) {
+        this.antalParkeradeFordon = antalParkeradeFordon;
+    }
+
     public double beräknaPrisVersion2(Fordon f, int antalDagar) {
         return prisStrategi.räknaUtPris(f, antalDagar);
     }
@@ -149,8 +153,8 @@ public class Garage {
         int i = hittaFordon(svar);
         if (i != -1) {
             int f = kontrolleraParkeringstid(getParkeradeFordon().get(i));
-            System.out.println("Kunden har parkerat: " + f + " dagar.");
-            System.out.println("Kunden får stå parkerad totalt: " + (getMaxTidParkering() - f) + " dagar till.");
+            System.out.println("Fordonet har varit parkerat i: " + f + " dagar.");
+            System.out.println("Fordonet får stå parkerad totalt: " + (getMaxTidParkering() - f) + " dagar till.");
         }
     }
 }
