@@ -15,20 +15,21 @@ import java.util.Scanner;
 public class Garage {
 
     private static final int antalParkeringsplatser = 20;
-    private static final Garage garageInstans = new Garage(); //OBS! STATIK VARIABEL!
+    private static final Garage garageInstans = new Garage(); //Statisk pga singleton
     private final int maxTidParkering = 365;
     private int antalParkeradeFordon;
     private double totalPris = 0;
     private List<Fordon> parkeradeFordon = new ArrayList<>();
     private StrategierPris prisStrategi;
 
-    private Garage() { //Tom konstruktor pga Singleton
+    private Garage() { //Tom statiskt konstruktor pga singleton.
     }
 
     public static Garage getGarageInstans() { //Statik för singelton, en instans.
         return garageInstans;
     }
 
+    //Hanterar incheckning av fordon. Baserat på input av användare så skapas olika fordon upp. Lagras i parkeradeFordon.
     public Fordon checkaInFordon(String typ, String regNr, LocalDate parkeringsDatum) {
         Scanner scan = new Scanner(System.in);
         Fordon f = null;
@@ -62,6 +63,7 @@ public class Garage {
         return f;
     }
 
+    //Hanterar utcheckning av fordon samt tar fram pris för parkering baserat på antalet dagar parkerade.
     public int checkaUtFordon(String regNr) {
         int bilPaPlats = hittaFordon(regNr);
         if (bilPaPlats == -1) {
@@ -69,19 +71,20 @@ public class Garage {
             return -1;
         } else if (kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)) > 5) {
             this.prisStrategi = new RabattPris();
-            totalPris = beräknaPrisVersion2(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
+            totalPris = beräknaFramPris(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
             parkeradeFordon.remove(bilPaPlats);
         } else if (kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)) > 10) {
             this.prisStrategi = new SuperRabattPris();
-            totalPris = beräknaPrisVersion2(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
+            totalPris = beräknaFramPris(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
             parkeradeFordon.remove(bilPaPlats);
         } else {
-            totalPris = beräknaPrisVersion2(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
+            totalPris = beräknaFramPris(parkeradeFordon.get(bilPaPlats), kontrolleraParkeringstid(parkeradeFordon.get(bilPaPlats)));
             parkeradeFordon.remove(bilPaPlats);
         }
         return 0;
     }
 
+    //Letar fram fordon baserat på registreringsnummer.
     public int hittaFordon(String regNr) {
         int counter = 0;
         for (Fordon f : parkeradeFordon) {
@@ -93,24 +96,19 @@ public class Garage {
         return -1;
     }
 
+    //Kontrollerar parkeringstid.
     public int kontrolleraParkeringstid(Fordon f) {
         LocalDate lokalTid = LocalDate.now();
         long dagarParkerat = ChronoUnit.DAYS.between(f.getIncheckningstid(), lokalTid);
         return (int) dagarParkerat;
     }
 
-    public void setPrisStrategi(StrategierPris prisStrategi) { //Sätter strategi
-        this.prisStrategi = prisStrategi;
-    }
-
-    public void setAntalParkeradeFordon(int antalParkeradeFordon) {
-        this.antalParkeradeFordon = antalParkeradeFordon;
-    }
-
-    public double beräknaPrisVersion2(Fordon f, int antalDagar) {
+    //Räknar ut priset baserat på antalet dagar parkerade och fordon.
+    public double beräknaFramPris(Fordon f, int antalDagar) {
         return prisStrategi.räknaUtPris(f, antalDagar);
     }
 
+    //Skickar faktura och skriver ut pris.
     public void skickaFaktura() {
         DecimalFormat formateringAvPris = new DecimalFormat("0.00");
         String formateratPris = formateringAvPris.format(totalPris);
@@ -118,20 +116,36 @@ public class Garage {
         System.out.println("Fakturan skickas till fordonsägarens hemadress, välkommen åter.");
     }
 
+    //Skriver ut incheckade bilar i konsollen.
     public void skrivUtIncheckadeBilar() {
         for (Fordon f : parkeradeFordon) {
             System.out.println(f.toString());
         }
     }
 
+    //Kontrollerar om det finns plats i garaget.
     public boolean kontrolleraPlats() {
         return antalParkeradeFordon < antalParkeringsplatser;
     }
 
+    //Kollar om det finns några lediga platser
     public void antalPlatserLediga() {
         int ledigaPlatser = antalParkeringsplatser - antalParkeradeFordon;
         System.out.println("Antal lediga platser i Garaget: " + ledigaPlatser);
         System.out.println(" ");
+    }
+
+    //Kontrollerar hur länge fordon varit parkerat och hur länge till fordonen kan parkera.
+    public void kontrollerBegränsningParkeradeDagar() {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Vilken fordon vill du kontrollera? (Skriv in registreringsnummer)");
+        String svar = scan.nextLine();
+        int i = hittaFordon(svar);
+        if (i != -1) {
+            int f = kontrolleraParkeringstid(getParkeradeFordon().get(i));
+            System.out.println("Fordonet har varit parkerat i: " + f + " dagar.");
+            System.out.println("Fordonet får stå parkerad totalt: " + (getMaxTidParkering() - f) + " dagar till.");
+        }
     }
 
     public List<Fordon> getParkeradeFordon() {
@@ -146,15 +160,11 @@ public class Garage {
         return maxTidParkering;
     }
 
-    public void kontrollerBegränsningParkeradeDagar() {
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Vilken fordon vill du kontrollera? (Skriv in registreringsnummer)");
-        String svar = scan.nextLine();
-        int i = hittaFordon(svar);
-        if (i != -1) {
-            int f = kontrolleraParkeringstid(getParkeradeFordon().get(i));
-            System.out.println("Fordonet har varit parkerat i: " + f + " dagar.");
-            System.out.println("Fordonet får stå parkerad totalt: " + (getMaxTidParkering() - f) + " dagar till.");
-        }
+    public void setPrisStrategi(StrategierPris prisStrategi) { //Sätter strategi
+        this.prisStrategi = prisStrategi;
+    }
+
+    public void setAntalParkeradeFordon(int antalParkeradeFordon) {
+        this.antalParkeradeFordon = antalParkeradeFordon;
     }
 }

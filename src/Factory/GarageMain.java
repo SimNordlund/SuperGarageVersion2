@@ -11,10 +11,10 @@ public class GarageMain {
     private final Databas databas = new Databas();
     private final Scanner scan = new Scanner(System.in);
     private final LocalDate parkeringsDatum = LocalDate.now();
-    private final Garage garage = Garage.getGarageInstans(); //Ska den vara final?
+    private final Garage garage = Garage.getGarageInstans();
 
     public GarageMain() {
-        garage.setPrisStrategi(new NormaltPris());
+        garage.setPrisStrategi(new NormaltPris()); //Sätter initialt pris utan rabatter. Justeras eventuellt senare i programmet.
         try {
             läsInFordon();
             välkommenOchInfo();
@@ -42,11 +42,13 @@ public class GarageMain {
         GarageMain garageMain = new GarageMain();
     }
 
+    //Frågor om användare är anställd eller kund.
     public String kundEllerAnställd() {
         System.out.println("Är du anställd eller kund? \nSkriv:  \n- 1 för kund. \n- 2 för anställd.");
         return scan.nextLine().trim().toLowerCase();
     }
 
+    //Hanterar funktioner i programmet för kund.
     public void kund() {
         System.out.println("Vill du checka in eller checka ut ett fordon? \nAnge: \n- 1 för att checka in \n- 2 för att checka ut" +
                 "\n- 3 för att stänga ner programmet.");
@@ -81,6 +83,7 @@ public class GarageMain {
         }
     }
 
+    //Metod som ber användaren om lösenord för att komma åt den administrativa delen av programmet
     public void kontrollOmAnställd () {
         System.out.println("Ange lösenordet");
         int försökLösenord = 0;
@@ -100,6 +103,7 @@ public class GarageMain {
         }
     }
 
+    //Hanterar funktioner i programmet för anställda.
     public void anställd() {
         kontrollOmAnställd();
         System.out.println("Vad vill du göra? Ange: \n- 1 för att söka i databas eller\n- 2 för Checka in eller checka ut en kund" +
@@ -131,6 +135,7 @@ public class GarageMain {
         }
     }
 
+    //Skriver ut information i samband med programmets start.
     public void välkommenOchInfo() {
         System.out.println("Välkommen till Super Garaget!");
         System.out.println("Om något inte fungerar kontakta oss på Supergaraget AB: 076 123 45 67" + "\n" +
@@ -138,6 +143,7 @@ public class GarageMain {
                 "\n - Obemannat 16:00 - 23:59.");
     }
 
+    //Sätter lagrade fordon ifrån textfilen i ParkeradeFordon. Sätter även antalet parkerade fordon.
     public void läsInFordon() {
         List<Fordon> tempHållare = databas.läsInFordon();
         garage.setParkeradeFordon(tempHållare);

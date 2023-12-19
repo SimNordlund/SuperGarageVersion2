@@ -10,6 +10,7 @@ import java.util.List;
 public class Databas {
     private final List<Fordon> parkeradeBilar = new ArrayList<>();
 
+    //Sparar ner fordon i textfil.
     public void sparaFordon(List<Fordon> parkeradeF) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/Factory/fordon.txt"))) {
             for (Fordon fordon : parkeradeF) {
@@ -21,6 +22,7 @@ public class Databas {
         }
     }
 
+    //Läser fordon ifrån textfil.
     public List<Fordon> läsInFordon() {
 
         try (BufferedReader reader = new BufferedReader(new FileReader("src/Factory/fordon.txt"))) {
