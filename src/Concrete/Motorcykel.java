@@ -2,7 +2,7 @@ package Concrete;
 
 import java.time.LocalDate;
 
-public class Motorcykel implements Fordon {
+public class Motorcykel implements Fordon { //Concrete klass.
 
     private final String regNr;
     private final double pris = 50;

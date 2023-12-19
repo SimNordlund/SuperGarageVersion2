@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Garage {
+public class Garage { //Agerar som factory klass, context klass och singleton klass.
 
     private static final int antalParkeringsplatser = 20;
     private static final Garage garageInstans = new Garage(); //Statisk pga singleton

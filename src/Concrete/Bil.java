@@ -2,7 +2,7 @@ package Concrete;
 
 import java.time.LocalDate;
 
-public class Bil implements Fordon {
+public class Bil implements Fordon { //Concrete klass.
 
     private final String regNr;
     private final double pris = 70;

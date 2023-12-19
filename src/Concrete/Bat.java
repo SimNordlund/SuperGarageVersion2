@@ -2,7 +2,7 @@ package Concrete;
 
 import java.time.LocalDate;
 
-public class Bat implements Fordon {
+public class Bat implements Fordon { //Concrete klass.
 
     private final String regNr;
     private final double pris = 100;
