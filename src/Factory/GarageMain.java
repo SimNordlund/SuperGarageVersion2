@@ -13,6 +13,8 @@ public class GarageMain {
     private final LocalDate parkeringsDatum = LocalDate.now();
     private final Garage garage = Garage.getGarageInstans();
 
+    //Lösenord til den administrativa delen av programmet är Garage123
+
     public GarageMain() {
         garage.setPrisStrategi(new NormaltPris()); //Sätter initialt pris utan rabatter. Justeras eventuellt senare i programmet.
         try {
